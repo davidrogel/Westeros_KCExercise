@@ -12,7 +12,7 @@ final class Person
 {
     // MARK: - Properties
     let name: String
-    let fullName: String
+    //let fullName: String
     private let _alias: String?
     let house: House
     
@@ -43,12 +43,12 @@ final class Person
     }
     
     // MARK: - Initialization
-    init(name: String, fullName: String, alias: String? = nil, house: House)
+    init(name: String, alias: String? = nil, house: House)
     {
-        self.name  = name
-        self.fullName = fullName
-            _alias = alias
-        self.house = house
+        self.name     = name
+        //self.fullName = fullName
+             _alias   = alias
+        self.house    = house
     }
     
     // los convenience inits tiene que llamar a self.init (el designado)
@@ -57,4 +57,50 @@ final class Person
 //        self.init(name: name, alias: nil, house: house)
 //    }
     
+}
+
+extension Person
+{
+    var fullName: String
+    {
+        return "\(name) \(house.name)"
+    }
+}
+
+extension Person
+{
+    // un proxy es algo que hace un trabajo sucio que no quieres hacer tu ahora
+    var proxyForEquality : String
+    {
+        return "\(name) \(alias) \(house.name)"
+    }
+    
+    var proxyForComparison : String
+    {
+        return fullName
+    }
+}
+
+extension Person : Hashable
+{
+    var hashValue: Int
+    {
+        return proxyForEquality.hashValue
+    }
+}
+
+extension Person : Equatable
+{
+    static func == (lhs: Person, rhs: Person) -> Bool
+    {
+        return lhs.proxyForEquality == rhs.proxyForEquality
+    }
+}
+
+extension Person : Comparable
+{
+    static func < (lhs: Person, rhs: Person) -> Bool
+    {
+        return lhs.proxyForComparison < rhs.proxyForComparison
+    }
 }
